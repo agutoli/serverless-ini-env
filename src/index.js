@@ -52,13 +52,9 @@ class ServerlessIniEnv {
       },
     };
 
+    this.loadEnvironments(this.settings[this.options.stage])
+
     this.hooks = {
-      'before:offline:start:init': () => BbPromise.bind(this).then(() => {
-        return this.loadEnvironments(this.settings[this.options.stage])
-      }),
-      'before:offline:start': () => BbPromise.bind(this).then(() => {
-        return this.loadEnvironments(this.settings[this.options.stage])
-      }),
       'update-environments:function:init': () => BbPromise.bind(this).then(() => {
         return this.updateSingleFunction(this.settings[this.options.stage])
       }),
@@ -103,7 +99,7 @@ class ServerlessIniEnv {
   }
 
   mergeConfig(ns, config) {
-    const environment = (this.serverless.service.functions[ns].environment || {})
+    const environment = ((this.serverless.service.functions[ns] || {}).environment || {})
     return Object.assign({}, environment, config[ns])
   }
 
@@ -159,6 +155,11 @@ class ServerlessIniEnv {
       const envs = this.mergeConfig(ns, config)
       const counts = Object.keys(envs).length
       this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1? 'var': 'vars'})`)
+
+      if (!this.serverless.service.functions[ns]) {
+        throw new Error(`function ${ns} does not exists!`)
+      }
+
       this.serverless.service.functions[ns].environment = envs
     }
 

@@ -1,0 +1,29 @@
+service: serverless-example # NOTE: update this with your service name
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs8.10
+
+plugins:
+  - serverless-ini-env
+  - serverless-offline
+
+custom:
+  serverless-ini-env:
+    dev: "./configs/dev.ini"
+    prod: "./configs/prod.ini"
+
+functions:
+  bar:
+    events:
+      - http:
+          path: /bar
+          method: get
+    handler: handler.bar.bar
+  foo:
+    events:
+      - http:
+          path: /foo
+          method: get
+    handler: handler.foo.foo
