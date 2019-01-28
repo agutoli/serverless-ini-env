@@ -7,9 +7,9 @@ class ServerlessIniEnv {
   constructor(serverless, options) {
     this.serverless = serverless
     this.provider = this.serverless.getProvider('aws');
-
     this.options = options
-    this.options.stage = this.provider.getStage() || 'dev';
+
+    this.options.stage = options.stage || 'dev';
     this.options.region = this.provider.getRegion();
 
     const inboundSettings = (serverless.service.custom || {})['serverless-ini-env']
@@ -53,15 +53,19 @@ class ServerlessIniEnv {
     };
 
     this.hooks = {
-      'before:offline:start:init': () => this.loadEnvironments(this.settings[this.options.stage]),
-      'before:offline:start': () => this.loadEnvironments(this.settings[this.options.stage]),
+      'before:offline:start:init': () => BbPromise.bind(this).then(() => {
+        return this.loadEnvironments(this.settings[this.options.stage])
+      }),
+      'before:offline:start': () => BbPromise.bind(this).then(() => {
+        return this.loadEnvironments(this.settings[this.options.stage])
+      }),
       'update-environments:function:init': () => BbPromise.bind(this).then(() => {
         return this.updateSingleFunction(this.settings[this.options.stage])
       }),
       'update-environments:init': () => BbPromise.bind(this).then(() => {
         return this.updateAllFunctions(this.settings[this.options.stage])
       })
-    };
+    }
   }
 
   loadFile(filename) {
@@ -118,6 +122,7 @@ class ServerlessIniEnv {
       await this.provider.request('Lambda', 'updateFunctionConfiguration', params)
       this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`)
     } catch(e) {
+      console.error(e)
       this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`)
     }
 
@@ -139,6 +144,7 @@ class ServerlessIniEnv {
         await this.provider.request('Lambda', 'updateFunctionConfiguration', params)
         this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`)
       } catch(e) {
+        console.error(e)
         this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`)
       }
     }
@@ -146,14 +152,21 @@ class ServerlessIniEnv {
     return true
   }
 
-  loadEnvironments(filename) {
+  async loadEnvironments(filename) {
     const config = this.loadConfigEnvs(filename)
+
     for (let ns in config) {
       const envs = this.mergeConfig(ns, config)
       const counts = Object.keys(envs).length
       this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1? 'var': 'vars'})`)
       this.serverless.service.functions[ns].environment = envs
     }
+
+    setTimeout(() => {
+      this.serverless.cli.log(`IniEnv config: "${filename}", stage: ${this.options.stage}`)
+    }, 3000)
+
+    return true
   }
 }
 
