@@ -68,7 +68,7 @@ MY_GLOBAL_VAR=PROD_VALUE
 ```
 
 # Usage and command line options
-```bash
+```shell
 # Update all lambda environments
 sls update-environments --stage prod
 
