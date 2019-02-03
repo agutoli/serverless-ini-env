@@ -35,7 +35,7 @@ functions:
 
 `sls deploy --stage dev` -> `./dev.ini`
 
-## Usage example
+## Environment configuration example
 
 `./your_configs/dev.ini`
 
@@ -67,6 +67,14 @@ MY_GLOBAL_VAR=PROD_VALUE
   BAR=PROD_VALUE
 ```
 
+# Usage and command line options
+```bash
+# Update all lambda environments
+sls update-environments --stage prod
+
+# Update a single function environments vars
+sls update-environments function -f core --stage qa
+```
 
 ## Contributing
 
