@@ -4,6 +4,9 @@ provider:
   name: aws
   region: us-east-1
   runtime: nodejs8.10
+  deploymentBucket:
+    name: scup-serverless-deployments-rc
+
 
 plugins:
   - serverless-ini-env
@@ -20,10 +23,10 @@ functions:
       - http:
           path: /bar
           method: get
-    handler: handler.bar.bar
+    handler: handler_bar.bar
   foo:
     events:
       - http:
           path: /foo
           method: get
-    handler: handler.foo.foo
+    handler: handler_foo.foo
