@@ -77,10 +77,14 @@ class ServerlessIniEnv {
     const globalEnvs = {};
     for (const key in config) {
       switch (typeof config[key]) {
-        case 'string':
         case 'boolean':
+          this.serverless.cli.log(`InvalidParameterType: [${key}=${config[key]}] environment vars does not support boolean type!`);
+          this.serverless.cli.log(`Consider using 1 or 0 ex. ${key}=1 or ${key}=0`);
+          process.exit(1);
+          break;
+        case 'string':
         case 'number':
-          globalEnvs[key] = config[key];
+          globalEnvs[key] = JSON.stringify(config[key]);
           break;
       }
     }
@@ -122,7 +126,6 @@ class ServerlessIniEnv {
       await this.provider.request('Lambda', 'updateFunctionConfiguration', params);
       this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
     } catch (e) {
-      console.error(e);
       this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`);
     }
 
@@ -142,11 +145,9 @@ class ServerlessIniEnv {
       };
 
       try {
-        this.provider.request('Lambda', 'updateFunctionConfiguration', params).then(() => {
-          this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
-        });
+        await this.provider.request('Lambda', 'updateFunctionConfiguration', params);
+        this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
       } catch (e) {
-        console.error(e);
         this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`);
       }
     }

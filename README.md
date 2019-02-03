@@ -21,6 +21,7 @@ custom:
   serverless-ini-env:
     dev: "./your_configs/dev.ini"
     prod: "./your_configs/prod.ini"
+
 functions:
   my_function_name_a:
     handler: handler.a_func

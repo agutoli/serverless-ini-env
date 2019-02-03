@@ -1,6 +1,7 @@
 {
   "extends": "nelson",
   "rules": {
+    "no-await-in-loop": 0,
     "brace-style": 0,
     "comma-dangle": 0,
     "class-methods-use-this": 0,
