@@ -1,14 +1,32 @@
 {
   "name": "serverless-ini-env",
-  "version": "1.0.8",
-  "description": "",
+  "version": "1.0.9",
+  "description": "Nice serverless plugin to setup environment variables with ini file",
   "main": "src/index.js",
+  "bugs": {
+    "url": "https://github.com/agutoli/serverless-ini-env/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agutoli/serverless-ini-env.git"
+  },
+  "homepage": "https://github.com/agutoli/serverless-ini-env",
   "scripts": {
     "test": "mocha test",
     "lint": "eslint src/**/*.js test/**/*.js"
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "Serverless",
+    "Amazon Web Services",
+    "AWS",
+    "Lambda",
+    "API Gateway",
+    "environment",
+    "env",
+    "ini"
+  ],
+  "author": "Bruno Agutoli <bruno.agutoli@gmail.com> (https://github.com/agutoli)",
+  "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.3",
     "ini": "^1.3.5"
