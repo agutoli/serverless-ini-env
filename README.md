@@ -5,7 +5,7 @@
 
 ## Install
 
-`npm install --save-dev serverless-ini-env`
+`npm install -D serverless-ini-env`
 
 Add the plugin to your `serverless.yml` file:
 
@@ -21,6 +21,11 @@ custom:
     dev: "./you_configs/dev.ini"
     prod: "./you_configs/prod.ini"
 ```
+
+`Note:` If you not specify any configuration, plugins will consider root folder and stage options ex.
+
+`sls deploy --stage qa` -> `./qa.ini`
+`sls deploy --stage dev` -> `./dev.ini`
 
 ## Ini File example
 
