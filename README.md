@@ -29,7 +29,7 @@ custom:
 
 `sls deploy --stage dev` -> `./dev.ini`
 
-## Ini File example
+## Usage example
 
 `./your_configs/dev.ini`
 
