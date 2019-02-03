@@ -25,6 +25,7 @@ custom:
 `Note:` If you not specify any configuration, plugins will consider root folder and stage options ex.
 
 `sls deploy --stage qa` -> `./qa.ini`
+
 `sls deploy --stage dev` -> `./dev.ini`
 
 ## Ini File example
