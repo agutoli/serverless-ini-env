@@ -15,7 +15,7 @@ plugins:
   - serverless-ini-env
 ```
 
-## Configuration
+## Serverless configuration
 ```yaml
 custom:
   serverless-ini-env:
