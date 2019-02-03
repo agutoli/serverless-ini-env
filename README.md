@@ -1,5 +1,7 @@
 # serverless-ini-env
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![Issues](https://img.shields.io/github/issues/agutoli/serverless-ini-env.svg)](https://github.com/agutoli/serverless-ini-env/issues) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://www.npmjs.com/package/serverless-ini-env)
+[![NPM](https://img.shields.io/npm/v/serverless-ini-env.svg)](https://www.npmjs.com/package/serverless-ini-env)
 
 ## Install
 
