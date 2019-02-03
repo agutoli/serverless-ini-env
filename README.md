@@ -22,7 +22,7 @@ custom:
     prod: "./your_configs/prod.ini"
 ```
 
-`Note:` If you not specify any configuration, plugins will consider root folder and stage options ex.
+`Note:` If you did not specify any configuration, plugins will consider root folder and stage options ex.
 
 `sls deploy --stage qa` -> `./qa.ini`
 
