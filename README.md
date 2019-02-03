@@ -21,6 +21,11 @@ custom:
   serverless-ini-env:
     dev: "./your_configs/dev.ini"
     prod: "./your_configs/prod.ini"
+functions:
+  my_function_name_a:
+    handler: handler.a_func
+  my_function_name_b:
+    handler: handler.b_func
 ```
 
 `Note:` If you did not specify any configuration, plugins will consider root folder and stage options ex.
