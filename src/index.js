@@ -7,8 +7,8 @@ class ServerlessIniEnv {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.provider = this.serverless.getProvider('aws');
-    this.options = options;
 
+    this.options = options;
     this.options.stage = options.stage || 'dev';
     this.options.region = this.provider.getRegion();
 
@@ -148,6 +148,7 @@ class ServerlessIniEnv {
         await this.provider.request('Lambda', 'updateFunctionConfiguration', params);
         this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
       } catch (e) {
+        console.log(e.message);
         this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`);
       }
     }
