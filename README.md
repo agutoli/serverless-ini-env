@@ -73,7 +73,7 @@ MY_GLOBAL_VAR=PROD_VALUE
 sls update-environments --stage prod
 
 # Update a single function environments vars
-sls update-environments function -f core --stage qa
+sls update-environments function -f my_function_name_a --stage qa
 ```
 
 ## Contributing
