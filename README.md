@@ -18,8 +18,8 @@ plugins:
 ```yaml
 custom:
   serverless-ini-env:
-    dev: "./you_configs/dev.ini"
-    prod: "./you_configs/prod.ini"
+    dev: "./your_configs/dev.ini"
+    prod: "./your_configs/prod.ini"
 ```
 
 `Note:` If you not specify any configuration, plugins will consider root folder and stage options ex.
@@ -29,7 +29,7 @@ custom:
 
 ## Ini File example
 
-`./you_configs/dev.ini`
+`./your_configs/dev.ini`
 
 ```ini
 # will be available for both functions
@@ -44,7 +44,7 @@ MY_GLOBAL_VAR=DEV_VALUE
   BAR=DEV_VALUE
 ```
 
-`./you_configs/prod.ini`
+`./your_configs/prod.ini`
 
 ```ini
 # will be available for both functions
