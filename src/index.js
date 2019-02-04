@@ -84,7 +84,7 @@ class ServerlessIniEnv {
           break;
         case 'string':
         case 'number':
-          globalEnvs[key] = JSON.stringify(config[key]);
+          globalEnvs[key] = config[key];
           break;
       }
     }
@@ -95,7 +95,7 @@ class ServerlessIniEnv {
         environments[key] = { ...globalEnvs, ...config[key] };
       }
     }
-
+    console.log(environments);
     return environments;
   }
 
