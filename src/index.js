@@ -85,6 +85,7 @@ class ServerlessIniEnv {
         case 'string':
         case 'number':
           globalEnvs[key] = config[key];
+          process.env[key] = config[key];
           break;
       }
     }
@@ -95,7 +96,7 @@ class ServerlessIniEnv {
         environments[key] = { ...globalEnvs, ...config[key] };
       }
     }
-    console.log(environments);
+
     return environments;
   }
 

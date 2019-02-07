@@ -1,6 +1,6 @@
 {
   "name": "serverless-ini-env",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Nice serverless plugin to setup environment variables with ini file",
   "main": "src/index.js",
   "bugs": {
