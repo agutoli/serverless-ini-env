@@ -65,6 +65,9 @@ MY_GLOBAL_VAR=PROD_VALUE
 [my_function_name_b]
   NAME="function B"
   BAR=PROD_VALUE
+
+[my_function_name_a,my_function_name_b]
+  SHARED_VARS="function A and B"
 ```
 
 # Usage and command line options
