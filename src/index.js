@@ -93,7 +93,10 @@ class ServerlessIniEnv {
     const environments = {};
     for (const key in config) {
       if (typeof config[key] === 'object') {
-        environments[key] = { ...globalEnvs, ...config[key] };
+        const splittedKeys = key.split(',');
+        splittedKeys.forEach(keyname => {
+          environments[keyname.trim()] = { ...globalEnvs, ...config[key] };
+        })
       }
     }
 
