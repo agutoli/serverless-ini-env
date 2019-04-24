@@ -2,6 +2,7 @@ const BbPromise = require('bluebird');
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
+const isObject = require('lodash.isobject');
 
 class ServerlessIniEnv {
   constructor(serverless, options) {
@@ -55,6 +56,8 @@ class ServerlessIniEnv {
     this.loadEnvironments(this.settings[this.options.stage]);
 
     this.hooks = {
+      'before:offline:start:init': () => BbPromise.bind(this)
+        .then(() => this.loadOffLineRefEnvironments()),
       'update-environments:function:init': () => BbPromise.bind(this)
         .then(() => this.updateSingleFunction(this.settings[this.options.stage])),
       'update-environments:init': () => BbPromise.bind(this)
@@ -158,6 +161,36 @@ class ServerlessIniEnv {
     }
 
     return true;
+  }
+
+  async listStackResources(resources, nextToken) {
+  	resources = resources || [];
+  	return this.provider.request("CloudFormation", "listStackResources", { StackName: this.provider.naming.getStackName(), NextToken: nextToken })
+  	.then(response => {
+  		resources.push.apply(resources, response.StackResourceSummaries);
+  		if (response.NextToken) {
+  			return listStackResources(resources, response.NextToken);
+  		}
+  	})
+  	.return(resources);
+  }
+
+  async loadOffLineRefEnvironments() {
+    const environment = this.serverless.service.provider.environment;
+
+    if (!isObject(environment)) return;
+
+    try {
+      const resources = await this.listStackResources();
+      for(let key in environment) {
+        if ( (isObject(environment[key])) && environment[key].Ref ) {
+          const resource = resources.find(x => x.LogicalResourceId == environment[key].Ref);
+          environment[key] = resource.PhysicalResourceId;
+        }
+      }
+    } catch(e) {
+      this.serverless.cli.log(`[IniEnv] - Can not resolve stack name: ${this.provider.naming.getStackName()}`);
+    }
   }
 
   async loadEnvironments(filename) {
