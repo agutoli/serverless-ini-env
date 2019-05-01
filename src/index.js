@@ -16,7 +16,7 @@ class ServerlessIniEnv {
     const inboundSettings = (serverless.service.custom || {})['serverless-ini-env'];
 
     const defaultSettings = {
-      [this.options.stage]: path.join(process.env.PWD, `${this.options.stage}.ini`)
+      [this.options.stage]: path.join(process.cwd(), `${this.options.stage}.ini`)
     };
 
     this.settings = Object.assign({}, defaultSettings, inboundSettings);
