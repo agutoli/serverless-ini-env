@@ -4,6 +4,8 @@ const path = require('path');
 const ini = require('ini');
 const isObject = require('lodash.isobject');
 
+
+
 class ServerlessIniEnv {
   constructor(serverless, options) {
     this.serverless = serverless;
@@ -63,6 +65,22 @@ class ServerlessIniEnv {
       'update-environments:init': () => BbPromise.bind(this)
         .then(() => this.updateAllFunctions(this.settings[this.options.stage]))
     };
+  }
+
+  async resolveRef(part) {
+    if (typeof part === 'string') {
+      return part;
+    }
+    switch (part.Ref) {
+      case 'AWS::Region':
+        return this.provider.getRegion();
+      case 'AWS::AccountId':
+        const accountId = await this.provider.getAccountId();
+        return this.provider.getAccountId();
+      case 'AWS::StackName':
+        const stackName = await this.provider.naming.getStackName();
+        return stackName
+    }
   }
 
   loadFile(filename) {
@@ -186,6 +204,15 @@ class ServerlessIniEnv {
         if ( (isObject(environment[key])) && environment[key].Ref ) {
           const resource = resources.find(x => x.LogicalResourceId == environment[key].Ref);
           environment[key] = resource.PhysicalResourceId;
+        } else if (environment[key]["Fn::Join"]) {
+          const delimiter = environment[key]["Fn::Join"][0];
+					const parts = environment[key]["Fn::Join"][1];
+          const resolved = [];
+          for (let x of parts) {
+            const _ref = await this.resolveRef(x);
+            resolved.push(_ref);
+          }
+          environment[key] = resolved.join(delimiter);
         }
       }
     } catch(e) {
@@ -203,7 +230,8 @@ class ServerlessIniEnv {
       this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1 ? 'var' : 'vars'})`);
 
       if (!this.serverless.service.functions[ns]) {
-        throw new Error(`function ${ns} does not exists!`);
+        console.log(`function ${ns} does not exists!`);
+        return;
       }
 
       this.serverless.service.functions[ns].environment = envs;
