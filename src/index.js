@@ -217,7 +217,8 @@ class ServerlessIniEnv {
       this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1 ? 'var' : 'vars'})`);
 
       if (!this.serverless.service.functions[ns]) {
-        throw new Error(`function ${ns} does not exists!`);
+        this.serverless.cli.log(`function ${ns} does not exists!`);
+        return;
       }
 
       this.serverless.service.functions[ns].environment = envs;
