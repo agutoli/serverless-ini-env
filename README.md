@@ -8,6 +8,10 @@
 
 `npm install -D serverless-ini-env`
 
+or 
+
+`serverless plugin install --name serverless-ini-env`
+
 Add the plugin to your `serverless.yml` file:
 
 ```yaml

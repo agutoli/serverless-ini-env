@@ -15,7 +15,21 @@ class ServerlessIniEnv {
     this.options.stage = options.stage || 'dev';
     this.options.region = this.provider.getRegion();
 
-    const inboundSettings = (serverless.service.custom || {})['serverless-ini-env'];
+    let inboundSettings = (serverless.service.custom || {})['serverless-ini-env'];
+
+    if (Array.isArray(inboundSettings)) {
+      const config = inboundSettings[0];
+      if (config.autoload) {
+        const configDir = path.join(process.cwd(), `${config.autoload}`);
+        const iniFiles = fs.readdirSync(configDir);
+        inboundSettings = iniFiles
+          .reduce((s, envFile) => {
+            const name = envFile.replace('.ini', '');
+            s[name] = path.join(config.autoload, envFile);
+            return s;
+          }, {});
+      }
+    }
 
     const defaultSettings = {
       [this.options.stage]: path.join(process.cwd(), `${this.options.stage}.ini`)
@@ -230,7 +244,7 @@ class ServerlessIniEnv {
       this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1 ? 'var' : 'vars'})`);
 
       if (!this.serverless.service.functions[ns]) {
-        console.log(`function ${ns} does not exists!`);
+        this.serverless.cli.log(`function ${ns} does not exists!`);
         return;
       }
 
