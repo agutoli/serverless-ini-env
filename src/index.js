@@ -204,6 +204,10 @@ class ServerlessIniEnv {
   			return listStackResources(resources, response.NextToken);
   		}
   	})
+    .catch(err => {
+      this.serverless.cli.log(`[IniEnv] - Can not resolve stack name: ${this.provider.naming.getStackName()}`);
+      return [];
+    })
   	.return(resources);
   }
 
@@ -230,7 +234,7 @@ class ServerlessIniEnv {
         }
       }
     } catch(e) {
-      this.serverless.cli.log(`[IniEnv] - Can not resolve stack name: ${this.provider.naming.getStackName()}`);
+      this.serverless.cli.log(`[IniEnv] - error: ${e}`);
     }
   }
 
