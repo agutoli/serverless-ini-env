@@ -4,8 +4,6 @@ const path = require('path');
 const ini = require('ini');
 const isObject = require('lodash.isobject');
 
-
-
 class ServerlessIniEnv {
   constructor(serverless, options) {
     this.serverless = serverless;
@@ -101,7 +99,7 @@ class ServerlessIniEnv {
     try {
       return fs.readFileSync(filename, 'utf-8');
     } catch (e) {
-      this.serverless.cli.log(`can not find config file "${filename}"`);
+      this.log(`can not find config file "${filename}"`);
       throw new Error('error');
     }
   }
@@ -113,8 +111,8 @@ class ServerlessIniEnv {
     for (const key in config) {
       switch (typeof config[key]) {
         case 'boolean':
-          this.serverless.cli.log(`InvalidParameterType: [${key}=${config[key]}] environment vars does not support boolean type!`);
-          this.serverless.cli.log(`Consider using 1 or 0 ex. ${key}=1 or ${key}=0`);
+          this.log(`InvalidParameterType: [${key}=${config[key]}] environment vars does not support boolean type!`);
+          this.log(`Consider using 1 or 0 ex. ${key}=1 or ${key}=0`);
           process.exit(1);
           break;
         case 'string':
@@ -126,11 +124,16 @@ class ServerlessIniEnv {
     }
 
     const environments = {};
+    let functions = this.getFunctionsName();
+    for(let func of functions) {
+      environments[func] = globalEnvs;
+    }
+
     for (const key in config) {
       if (typeof config[key] === 'object') {
         const splittedKeys = key.split(',');
         splittedKeys.forEach(keyname => {
-          environments[keyname.trim()] = { ...globalEnvs, ...config[key] };
+          environments[keyname.trim()] = { ...environments[keyname.trim()], ...config[key] };
         })
       }
     }
@@ -142,6 +145,10 @@ class ServerlessIniEnv {
     const service = this.serverless.service.service;
 
     return `${service}-${this.options.stage}-${ns}`;
+  }
+
+  getFunctionsName() {
+    return Object.keys(this.serverless.service.functions);
   }
 
   mergeConfig(ns, config) {
@@ -163,9 +170,9 @@ class ServerlessIniEnv {
 
     try {
       await this.provider.request('Lambda', 'updateFunctionConfiguration', params);
-      this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
+      this.log(`${FunctionName} - Updating environments... OK`);
     } catch (e) {
-      this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`);
+      this.error(`${FunctionName} - Updating environments... Error`);
     }
 
     return true;
@@ -185,10 +192,10 @@ class ServerlessIniEnv {
 
       try {
         await this.provider.request('Lambda', 'updateFunctionConfiguration', params);
-        this.serverless.cli.log(`[${FunctionName}] - Updating environments... OK`);
+        this.log(`${FunctionName} - Updating environments... OK`);
       } catch (e) {
         console.log(e.message);
-        this.serverless.cli.log(`[${FunctionName}] - Updating environments... Error`);
+        this.error(`${FunctionName} - Updating environments... Error`);
       }
     }
 
@@ -205,7 +212,7 @@ class ServerlessIniEnv {
   		}
   	})
     .catch(err => {
-      this.serverless.cli.log(`[IniEnv] - Can not resolve stack name: ${this.provider.naming.getStackName()}`);
+      this.error(`Can not resolve stack name: ${this.provider.naming.getStackName()}`);
       return [];
     })
   	.return(resources);
@@ -234,21 +241,20 @@ class ServerlessIniEnv {
         }
       }
     } catch(e) {
-      this.serverless.cli.log(`[IniEnv] - error: ${e}`);
+      this.error(`error: ${e}`);
     }
   }
 
   async loadEnvironments(filename) {
     const config = this.loadConfigEnvs(filename);
-
     for (const ns in config) {
       const envs = this.mergeConfig(ns, config);
       const counts = Object.keys(envs).length;
 
-      this.serverless.cli.log(`[${ns}] - loading environments... (${counts} ${counts === 1 ? 'var' : 'vars'})`);
+      this.log(`function.${ns} - loading environments... (${counts} ${counts === 1 ? 'var' : 'vars'})`);
 
       if (!this.serverless.service.functions[ns]) {
-        this.serverless.cli.log(`function ${ns} does not exists!`);
+        this.error(`function.${ns} does not exists!`);
         return;
       }
 
@@ -256,10 +262,18 @@ class ServerlessIniEnv {
     }
 
     setTimeout(() => {
-      this.serverless.cli.log(`IniEnv config: "${filename}", stage: ${this.options.stage}`);
+      this.log(`config: "${filename}", stage: ${this.options.stage}`);
     }, 3000);
 
     return true;
+  }
+
+  log(text) {
+    this.serverless.cli.log(text, '[IniEnv]');
+  }
+
+  error(text) {
+    this.serverless.cli.log(text, '[IniEnv]', { color: 'red' });
   }
 }
 
