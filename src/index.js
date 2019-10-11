@@ -99,45 +99,63 @@ class ServerlessIniEnv {
     try {
       return fs.readFileSync(filename, 'utf-8');
     } catch (e) {
-      this.log(`can not find config file "${filename}"`);
+      this.error(`can not find config file "${filename}"`);
       throw new Error('error');
+    }
+  }
+
+  formatToSystemEnv(value, key) {
+    switch (typeof value) {
+      case 'boolean':
+      case 'string':
+      case 'number':
+        return value;
+    }
+  }
+
+  formatToServerless(value, key) {
+    switch (typeof value) {
+      case 'boolean':
+        this.warn(`InvalidParameterType: [${key}=${value}] environment vars does not support boolean type!`);
+        this.warn(`Consider using 1 or 0 ex. ${key}=1 or ${key}=0`);
+        return value ? 1 : 0;
+      case 'string':
+      case 'number':
+        return value;
     }
   }
 
   loadConfigEnvs(filename) {
     const config = ini.parse(this.loadFile(filename));
-
     const globalEnvs = {};
     for (const key in config) {
-      switch (typeof config[key]) {
-        case 'boolean':
-          this.log(`InvalidParameterType: [${key}=${config[key]}] environment vars does not support boolean type!`);
-          this.log(`Consider using 1 or 0 ex. ${key}=1 or ${key}=0`);
-          process.exit(1);
-          break;
-        case 'string':
-        case 'number':
-          globalEnvs[key] = config[key];
-          process.env[key] = config[key];
-          break;
+      const value = this.formatToServerless(config[key], key);
+      if (value) {
+        process.env[key] = this.formatToSystemEnv(config[key], key);
+        globalEnvs[key] = this.formatToServerless(config[key], key);
       }
     }
 
     const environments = {};
     let functions = this.getFunctionsName();
     for(let func of functions) {
-      environments[func] = globalEnvs;
+      environments[func] = { ...globalEnvs };
     }
 
     for (const key in config) {
       if (typeof config[key] === 'object') {
         const splittedKeys = key.split(',');
         splittedKeys.forEach(keyname => {
-          environments[keyname.trim()] = { ...environments[keyname.trim()], ...config[key] };
+          const localVars = Object.assign({}, config[key]);
+          for(let localVar in localVars) {
+            if ( environments[keyname.trim()] ) {
+              process.env[localVar] = this.formatToSystemEnv(localVars[localVar], localVar);
+              environments[keyname.trim()][localVar] = this.formatToServerless(localVars[localVar], localVar);
+            }
+          }
         })
       }
     }
-
     return environments;
   }
 
@@ -274,6 +292,10 @@ class ServerlessIniEnv {
 
   error(text) {
     this.serverless.cli.log(text, '[IniEnv]', { color: 'red' });
+  }
+
+  warn(text) {
+    this.serverless.cli.log(text, '[IniEnv]', { color: 'orange' });
   }
 }
 
