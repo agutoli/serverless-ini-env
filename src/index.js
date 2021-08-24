@@ -43,10 +43,12 @@ class ServerlessIniEnv {
           stage: {
             usage: 'Stage of the service',
             shortcut: 's',
+            type: 'string',
           },
           function: {
             usage: 'Update a single function environments vars',
             shortcut: 'f',
+            type: 'string',
           },
         },
         commands: {
@@ -59,7 +61,8 @@ class ServerlessIniEnv {
             options: {
               function: {
                 usage: 'Name of the function',
-                shortcut: 'f'
+                shortcut: 'f',
+                type: 'string',
               },
             }
           }
